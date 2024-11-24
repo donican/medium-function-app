@@ -1,5 +1,11 @@
 import azure.functions as func
 import logging
+from repositories.table_storage_repository import TableDirectoryClient
+from logger_config import setup_logging
+import logging
+
+setup_logging()
+logger = logging.getLogger(__name__)
 
 app = func.FunctionApp(http_auth_level=func.AuthLevel.ANONYMOUS)
 
@@ -7,19 +13,18 @@ app = func.FunctionApp(http_auth_level=func.AuthLevel.ANONYMOUS)
 def medium_http_trigger(req: func.HttpRequest) -> func.HttpResponse:
     logging.info('Python HTTP trigger function processed a request.')
 
-    name = req.params.get('name')
-    if not name:
-        try:
-            req_body = req.get_json()
-        except ValueError:
-            pass
-        else:
-            name = req_body.get('name')
+    table_name = "ActivityLogs"
+    table_client = TableDirectoryClient(table_name)
+    
+    entities = table_client.read_entities()
 
-    if name:
-        return func.HttpResponse(f"Hello, {name}. This HTTP triggered function executed successfully.")
+    if entities:
+        for entity in entities:
+            logging.info(f"Entidade: {entity}")
     else:
-        return func.HttpResponse(
-             "This HTTP triggered function executed successfully. Pass a name in the query string or in the request body for a personalized response.",
-             status_code=200
-        )
+        logging.info("No entities found or an error occurred.")
+
+    return func.HttpResponse(
+        "Entities read successfully! Check logs for more details.",
+        status_code=200
+    )

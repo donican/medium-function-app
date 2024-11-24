@@ -2,9 +2,9 @@ import logging
 from azure.data.tables import TableServiceClient
 from azure.core.exceptions import AzureError, ResourceNotFoundError, ClientAuthenticationError, HttpResponseError
 from config import Config
+from typing import List, Dict 
 
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
 
 class TableDirectoryClient:
     def __init__(self, table_name: str):
@@ -13,7 +13,7 @@ class TableDirectoryClient:
             self.table_client = self.table_service_client.get_table_client(table_name)
             logger.info(f"Connected to table: {table_name}")
         except Exception as e:
-            logger.error(f"Failed to connect: {str(e)}")
+            logger.error(f"Failed to connect to table {table_name}: {str(e)}")
             raise
     
     @staticmethod
@@ -34,7 +34,7 @@ class TableDirectoryClient:
         return None
 
 
-    def read_entities(self, partition_key: str = None, row_key: str = None):
+    def read_entities(self, partition_key: str = None, row_key: str = None) -> List[Dict]:
         """
         Reads entities from the Azure Table Storage.
 
