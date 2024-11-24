@@ -1,0 +1,4 @@
+import os
+
+class Config:
+    AZURE_STORAGE_CONNECTION_STRING = os.getenv("AZURE_STORAGE_CONNECTION_STRING")
