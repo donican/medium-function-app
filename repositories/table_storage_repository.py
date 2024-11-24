@@ -1,20 +1,22 @@
 import logging
 from azure.data.tables import TableServiceClient
 from azure.core.exceptions import AzureError, ResourceNotFoundError, ClientAuthenticationError, HttpResponseError
+from config import Config
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 class TableDirectoryClient:
-    def __init__(self, connection_string: str, table_name: str):
+    def __init__(self, table_name: str):
         try:
-            self.table_service_client = TableServiceClient.from_connection_string(connection_string)
+            self.table_service_client = TableServiceClient.from_connection_string(Config.AZURE_STORAGE_CONNECTION_STRING)
             self.table_client = self.table_service_client.get_table_client(table_name)
             logger.info(f"Connected to table: {table_name}")
         except Exception as e:
             logger.error(f"Failed to connect: {str(e)}")
             raise
     
+    @staticmethod
     def build_table_storage_filter(partition_key: str = None, row_key: str = None) -> str:
         """
         Constructs a filter query for Azure Table Storage based on PartitionKey and/or RowKey.
