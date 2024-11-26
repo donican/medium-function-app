@@ -41,6 +41,7 @@ class TableDirectoryClient:
         :param partition_key: PartitionKey for filtering entities.
         :param row_key: RowKey for filtering entities.
         :return: List of entities retrieved from the table.
+        :raises: ResourceNotFoundError, ClientAuthenticationError, HttpResponseError, AzureError, Exception.
         """
         try:
             # Build the filter query dynamically using the helper function
@@ -67,6 +68,74 @@ class TableDirectoryClient:
         except AzureError as e:
             logger.error(f"Azure error occurred: {str(e)}")
             raise 
+        except Exception as e:
+            logger.error(f"Unexpected error occurred: {str(e)}")
+            raise
+
+    def insert_entity(self, entity: Dict) -> None:
+        """
+        Inserts an entity into the Azure Table Storage.
+
+        :param entity: A dictionary representing the entity to insert. 
+                    Must contain 'PartitionKey' and 'RowKey'.
+        :raises: ResourceNotFoundError, ClientAuthenticationError, HttpResponseError, AzureError, Exception.
+        """
+        try:
+            # Verifica se 'PartitionKey' e 'RowKey' estão presentes
+            if 'PartitionKey' not in entity or 'RowKey' not in entity:
+                raise ValueError("The entity must contain 'PartitionKey' and 'RowKey'.")
+
+            logger.info(f"Inserting entity: {entity}")
+            self.table_client.create_entity(entity=entity)
+            logger.info("Entity inserted successfully.")
+        
+        except ResourceNotFoundError as e:
+            logger.error(f"Table not found: {str(e)}")
+            raise
+        except ClientAuthenticationError as e:
+            logger.error(f"Authentication failed: {str(e)}")
+            raise
+        except HttpResponseError as e:
+            logger.error(f"HTTP error occurred: {str(e)}")
+            raise
+        except AzureError as e:
+            logger.error(f"Azure error occurred: {str(e)}")
+            raise
+        except Exception as e:
+            logger.error(f"Unexpected error occurred: {str(e)}")
+            raise
+
+    def insert_entities(self, entities: List[Dict]) -> None:
+        """
+        Inserts multiple entities into the Azure Table Storage.
+
+        :param entities: A list of dictionaries representing the entities to insert.
+                        Each entity must contain 'PartitionKey' and 'RowKey'.
+        :raises: ResourceNotFoundError, ClientAuthenticationError, HttpResponseError, AzureError, Exception.
+        """
+        try:
+            for entity in entities:
+                # Verifica se 'PartitionKey' e 'RowKey' estão presentes
+                if 'PartitionKey' not in entity or 'RowKey' not in entity:
+                    raise ValueError(f"Each entity must contain 'PartitionKey' and 'RowKey'. Invalid entity: {entity}")
+
+                logger.info(f"Inserting entity: {entity}")
+                self.table_client.create_entity(entity=entity)
+            
+            logger.info(f"Successfully inserted {len(entities)} entities.")
+
+        except ResourceNotFoundError as e:
+            logger.error(f"Table not found: {str(e)}")
+            raise
+        except ClientAuthenticationError as e:
+            logger.error(f"Authentication failed: {str(e)}")
+            raise
+        except HttpResponseError as e:
+            logger.error(f"HTTP error occurred: {str(e)}")
+            raise
+        except AzureError as e:
+            logger.error(f"Azure error occurred: {str(e)}")
+            raise
         except Exception as e:
             logger.error(f"Unexpected error occurred: {str(e)}")
             raise
