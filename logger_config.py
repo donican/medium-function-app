@@ -22,7 +22,7 @@ def setup_logging():
         datefmt=date_format,
         handlers=[
             logging.StreamHandler(),
-            logging.FileHandler("application.log", mode="a"),
+            #logging.FileHandler("application.log", mode="a"),
         ]
     )
 
