@@ -2,6 +2,7 @@ import logging
 from azure.storage.blob import BlobServiceClient, ContainerClient
 from azure.core.exceptions import AzureError, ResourceNotFoundError, ClientAuthenticationError, HttpResponseError
 from config import Config
+from typing import List
 
 logger = logging.getLogger(__name__)
 
